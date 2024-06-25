@@ -1,0 +1,392 @@
+<?php
+
+session_start();
+include "connectDB.php";
+
+class allFunction{
+  private $conn = null;
+
+  public function __construct() {
+    if ($this->conn == null) {
+      $koneksi = new connectDB();
+      $this->conn = $koneksi->connectDatabase();
+    }
+  }
+
+  public function checkUsername ($username) {
+    try {
+      $query = $this->conn->prepare('
+        SELECT * FROM tbluser WHERE username = ?
+      ');
+      $query->bindParam(1, $username, PDO::PARAM_STR);
+      $query->execute();
+      if ($query){
+        return $query->fetch();
+      }
+      else{
+        return '0';
+      }
+    }
+    catch (PDOException $e) {
+      echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+    }
+  }
+
+  public function registerCustomer ($data) {
+    try {
+      $query = $this->conn->prepare('
+        INSERT INTO tbluser VALUES (NULL , :username, :password, :address, :phoneNumber, :email, "1")
+      ');
+      $query->execute($data);
+      return 'Berhasil';
+    }
+    catch (PDOException $e) {
+      echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+    }
+  }
+
+  public function loginCustomer ($username) {
+    try {
+      $query = $this->conn->prepare('
+        SELECT * FROM tbluser WHERE username = ?
+      ');
+      $query->bindParam(1, $username, PDO::PARAM_STR);
+      $query->execute();
+      if ($query){
+        return $query->fetch();
+      }
+      else{
+        return '0';
+      }
+    }
+    catch (PDOException $e) {
+      echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+    }
+  }
+
+  // public function showAllProduk() {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT * FROM tblproduk WHERE deskripsi LIKE "Available"
+  //     ');
+  //     $query->execute();
+  //     return $query->fetchAll();
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function checkCustomer($row) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT * FROM tblcustomer WHERE username = ?
+  //     ');
+  //     $query->bindParam(1, $row, PDO::PARAM_STR);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function checkProduk($row) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT * FROM tblproduk WHERE idproduk = ?
+  //     ');
+  //     $query->bindParam(1, $row, PDO::PARAM_STR);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function updateCustomer($data) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       UPDATE tblcustomer SET username = :username, email = :email, nohp = :nohp WHERE idcustomer = :idcustomer
+  //     ');
+  //     $query->execute($data);
+  //     return 'Berhasil';
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function topup($data) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       INSERT INTO tbltopup VALUES (NULL , :idcustomer, :jmltopup, :tgltopup, :status)
+  //     ');
+  //     $query->execute($data);
+  //     return 'Berhasil';
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function hitungTotalTopup($idcustomer) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT SUM(jmltopup) AS totaltopup FROM tbltopup WHERE idcustomer = ?
+  //     ');
+  //     $query->bindParam(1, $idcustomer, PDO::PARAM_INT);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function hitungTotalOrder($idcustomer) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT SUM(harga - ((harga * jmldiskonpersen) / 100)) AS totalorder FROM tblorder WHERE idcustomer = ?
+  //     ');
+  //     $query->bindParam(1, $idcustomer, PDO::PARAM_INT);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function order ($idcustomer, $idproduk, $hargaproduk, $totaltopup, $totalorder, $idvoucher, $jmldiskonpersen, $idkodeproduk) {
+  //   $data = array(
+  //     'idcustomer' => $idcustomer,
+  //     'idproduk' => $idproduk,
+  //     'idvoucher' => $idvoucher,
+  //     'idkodeproduk' => $idkodeproduk,
+  //     'tglorder' => date("Y-m-d H:i:s"),
+  //     'jmldiskonpersen' => $jmldiskonpersen,
+  //     'hargaproduk' => $hargaproduk,
+  //     'status' => 'Berhasil'
+  //   );
+  //
+  //   try {
+  //     $hargaAsli = 0;
+  //     $hargaAsli = (($hargaproduk * $jmldiskonpersen)/100);
+  //     if ($totaltopup > 0) {
+  //       if (($totaltopup - $totalorder) > 0) {
+  //         if ($hargaAsli != 0) {
+  //           if ((($totaltopup - $totalorder) - $hargaAsli) >= 0) {
+  //             $query = $this->conn->prepare('
+  //                 INSERT INTO tblorder VALUES (NULL , :idcustomer, :idproduk, :idvoucher, :idkodeproduk ,:tglorder, :jmldiskonpersen, :hargaproduk, :status)
+  //               ');
+  //             $query->execute($data);
+  //             return 'Berhasil';
+  //           }
+  //           else {
+  //             return 'Saldo Tidak Mencukupi';
+  //           }
+  //         }
+  //         else {
+  //           if ((($totaltopup - $totalorder) - $hargaproduk) >= 0) {
+  //             $query = $this->conn->prepare('
+  //                 INSERT INTO tblorder VALUES (NULL , :idcustomer, :idproduk, :idvoucher, :idkodeproduk ,:tglorder, :jmldiskonpersen, :hargaproduk, :status)
+  //               ');
+  //             $query->execute($data);
+  //             return 'Berhasil';
+  //           }
+  //           else {
+  //             return 'Saldo Tidak Mencukupi';
+  //           }
+  //         }
+  //       }
+  //       else {
+  //         return 'Saldo Tidak Mencukupi';
+  //       }
+  //     }
+  //     else {
+  //       return 'Saldo Tidak Mencukupi';
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function showOrderHistory($idcustomer) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT *, harga - ((harga * jmldiskonpersen) / 100) AS totalorder, tblkodeproduk.status AS statuskodeproduk, tblorder.status AS statusorder
+  //       FROM tblcustomer
+  //       CROSS JOIN tblorder USING(idcustomer)
+  //       CROSS JOIN tblproduk USING(idproduk)
+  //       CROSS JOIN tblkodeproduk USING(idkodeproduk)
+  //       WHERE
+  //         tblcustomer.idcustomer = :idcustomer
+  //     ');
+  //     $query->bindParam(':idcustomer', $idcustomer, PDO::PARAM_INT);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetchAll(PDO::FETCH_ASSOC);
+  //     }
+  //     else {
+  //       return '0';
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function contact($idcustomer, $subject, $message) {
+  //   try {
+  //     $data = array(
+  //       'idcustomer' => $idcustomer,
+  //       'subject' => $subject,
+  //       'message' => $message,
+  //       'tglcontact' => date("Y-m-d H:i:s"),
+  //       'status' => "On Progress",
+  //     );
+  //     $query = $this->conn->prepare('
+  //       INSERT INTO tblcontact VALUES (NULL, :idcustomer, :subject, :message, :tglcontact, :status)
+  //     ');
+  //     $query->execute($data);
+  //     return 'Berhasil';
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function cekVoucher($kodeVoucher) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT * FROM tblvoucher WHERE kodevoucher = ? AND status = "Available"
+  //     ');
+  //     $query->bindParam(1, $kodeVoucher, PDO::PARAM_INT);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function randomString($length) {
+  //   try {
+  //     $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  //     $pass = array();
+  //     $alphaLength = strlen($alphabet) - 1;
+  //     for ($i = 0; $i < $length; $i++) {
+  //         $n = rand(0, $alphaLength);
+  //         $pass[] = $alphabet[$n];
+  //     }
+  //     return implode($pass);
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function updatePassword($data) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       UPDATE tblcustomer SET password = :password WHERE username = :username
+  //     ');
+  //     $query->execute($data);
+  //     return 'Berhasil';
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function kodeProduk($createKodeProduk) {
+  //   try {
+  //     $data = array(
+  //       'kodeProduk' => $createKodeProduk,
+  //       'status' => 'Unused'
+  //     );
+  //     $query = $this->conn->prepare('
+  //       INSERT INTO tblkodeproduk VALUES (NULL , :kodeProduk, :status)
+  //     ');
+  //     $query->execute($data);
+  //     return 'Berhasil';
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function cekKodeProduk($kodeProduk) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT * FROM tblkodeproduk WHERE kodeproduk = ? AND status = "Unused"
+  //     ');
+  //     $query->bindParam(1, $kodeProduk, PDO::PARAM_STR);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function useKodeProduct($idkodeproduk) {
+  //   $data = array(
+  //     'idkode' => $idkodeproduk
+  //   );
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       UPDATE tblkodeproduk SET status = "Has been used" WHERE idkodeproduk = :idkode
+  //     ');
+  //     $query->execute($data);
+  //     if ($query) {
+  //       return 'Berhasil';
+  //     }
+  //     else {
+  //       return 'Gagal';
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+  //
+  // public function showProduct($idkodeproduk) {
+  //   try {
+  //     $query = $this->conn->prepare('
+  //       SELECT *
+  //       FROM tblorder
+  //       CROSS JOIN tblproduk USING(idproduk)
+  //       WHERE
+  //         tblorder.idkodeproduk = :idkodeproduk
+  //     ');
+  //     $query->bindParam(':idkodeproduk', $idkodeproduk, PDO::PARAM_INT);
+  //     $query->execute();
+  //     if ($query){
+  //       return $query->fetch();
+  //     }
+  //     else {
+  //       return '0';
+  //     }
+  //   }
+  //   catch (PDOException $e) {
+  //     echo '<script> console.log ("' . $e->getMessage() . '")</scipt>';
+  //   }
+  // }
+}
+?>
